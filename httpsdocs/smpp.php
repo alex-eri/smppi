@@ -1,25 +1,24 @@
 <?php
 
 /*
- * private/smpp.php
+ * httpsoocs/smpp.php
  */
 
-function smpp_send($smpp_hosts,$smpp_port,$smpp_login,$smpp_password,$smpp_from,$smpp_to,$smpp_msg){
+function smpp_send($smpp_hosts,$smpp_port,$smpp_login,$smpp_password,$smpp_from,$smpp_to,$message){
 
-	require_once '../httpsdocs/includes/smpp/smppclient.class.php';
-	//require_once 'smpp/gsmencoder.class.php';
-	require_once '../httpsdocs/includes/smpp/sockettransport.class.php';
+	require_once 'includes/smpp/smppclient.class.php';
+	require_once 'includes/smpp/gsmencoder.class.php';
+	require_once 'includes/smpp/sockettransport.class.php';
 	
 	// Construct transport and client
 	$transport = new SocketTransport($smpp_hosts,$smpp_port);
-	$transport->setRecvTimeout(60000);
+	$transport->setRecvTimeout(10000);
 	$smpp = new SmppClient($transport);
 	
 	// Activate binary hex-output of server interaction
 	$smpp->debug = false;
 	$transport->debug = false;
 	
-	// Open the connection
 	$transport->open();
 	$smpp->bindTransmitter($smpp_login,$smpp_password);
 	
@@ -48,13 +47,39 @@ function smpp_send($smpp_hosts,$smpp_port,$smpp_login,$smpp_password,$smpp_from,
 	if($smpp_id = $smpp->sendSMS($from,$to,$encodedMessage,$tags,$data_coding)){
 		// Close connection
 		$smpp->close();
-		
 		return trim($smpp_id);
 	}
 	else{
 		// Close connection
 		$smpp->close();
-		
 		return false;
 	}
 }
+
+function smpp_check($smpp_hosts,$smpp_port,$smpp_login,$smpp_password,$smpp_from,$smpp_id){
+
+	require_once 'includes/smpp/smppclient.class.php';
+	require_once 'includes/smpp/sockettransport.class.php';
+
+	$transport = new SocketTransport($smpp_hosts,$smpp_port);
+	$transport->setRecvTimeout(10000);
+	$smpp = new SmppClient($transport);
+
+	$smpp->debug = false;
+	$transport->debug = false;
+
+	$transport->open();
+	$smpp->bindTransmitter($smpp_login,$smpp_password);
+
+	$source = new SmppAddress($smpp_from,SMPP::TON_ALPHANUMERIC);
+
+	if($smpp_res = $smpp->queryStatus($smpp_id,$source)){
+		$smpp->close();
+		return $smpp_res;
+	}
+	else{
+		$smpp->close();
+		return false;
+	}
+}
+

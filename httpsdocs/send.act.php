@@ -12,22 +12,25 @@ include("includes/auth.inc.php");
 if(in_array("SMS_WEBSEND", $user_rights)){
 
 	if(isset($_REQUEST['phone']) && isset($_REQUEST['msg'])){
-		$_REQUEST['phone'] = preg_replace("/\D/", "", $_REQUEST['phone']);
+		$phone = $csms->check_phone($_REQUEST['phone']);
+		$msg = $db->real_escape_string($_REQUEST['msg']);
 		$translit = (isset($_REQUEST['translit']) && $_REQUEST['translit'] == 1) ? 1 : 0;
 		$method = (isset($_REQUEST['method'])) ? $_REQUEST['method'] : "gsm";
-		if($_REQUEST['phone'] != "" && $_REQUEST['msg'] != ""){
-			if($sms_id = $csms->sendsms($_REQUEST['phone'],$_REQUEST['msg'],$translit,$method)){
-				$csms->users_log($user_id, "sendsms:{$sms_id}", $_SERVER['REMOTE_ADDR']);
-				header("location: /outgoing/");
-			}
+		try{
+			$sms_id = $csms->sendsms($phone,$msg,$translit,$method);
+			$csms->users_log($user_id, "sendsms:{$sms_id}", $_SERVER['REMOTE_ADDR']);
+			header("location: /outgoing/");
 		}
-		else{
+		catch (Exception $e){
 			$_SESSION['send_error'] = SEND_ERROR;
 			header("location: /send/");
 		}
-		
 	}
-	
+	else{
+		$_SESSION['send_error'] = FIELDS_ERROR;
+		header("location: /send/");
+	}
+		
 }
 else{
 	header("location: /");

@@ -1,6 +1,9 @@
 <?php
 
-define("SEND_ERROR", "Incorrect fields");
+define("FIELDS_ERROR", "Incorrect fields");
+define("SEND_ERROR", "Send error");
+
+define("USER_FIELDS_ERROR", "Incorrect fields");
 
 define("USER_FIELDS_ERROR", "Incorrect fields");
 
@@ -17,7 +20,10 @@ define("THEAD_INTERFACE", "Interface");
 define("THEAD_RIGHTS", "Rights");
 define("SENT_YES", "Sent");
 define("SENT_NO", "During");
+define("IN_PROCESS", "In process");
 define("DELIVERED", "Delivered");
+define("SENT_ERROR", "Sent error");
+define("DELIVER_ERROR", "Deliver error");
 define("PC_SENDING_ON", "Sending switched on");
 define("PC_SENDING_OFF", "Sending switched off");
 define("PC_RECEIVING_ON", "Receiving switched on");
@@ -64,5 +70,4 @@ $rights_descr = array(
 		"SMS_APISEND" => "Access to send sms from API",
 		"SMS_WEBSEND" => "Access to send sms from Web",
 );
-
 

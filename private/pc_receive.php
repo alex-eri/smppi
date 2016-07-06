@@ -2,7 +2,7 @@
 
 /*
  * private/pc_receive.php
- * 
+ *
  * sms receive by php/pcntl
  */
 
@@ -49,12 +49,8 @@ elseif($act == "start"){
 		if(file_put_contents($pid_file, $spid)){
 			print "start $spid\n";
 			
-			// move to loop
-			//require_once("config.php");
-			//require_once("smpp/smppclient.class.php");
-			//require_once("smpp/sockettransport.class.php");
-			//require_once("db.php");
-			//require_once("log.php");
+			require_once("config.php");
+			require_once("db.php");
 			
 		}
 		else{
@@ -75,15 +71,7 @@ elseif($act == "start"){
 	// loop forever performing tasks
 	while (true) {
 		
-		// from fork
-		require_once("config.php");
-		require_once("smpp/smppclient.class.php");
-		require_once("smpp/sockettransport.class.php");
-		require_once("db.php");
-		require_once("log.php");
-		
 		wait_read_gsm(PATH_INCOMING,PATH_RECEIVED);
-		//wait_read_smpp($smpp_hosts,$smpp_port,$smpp_login,$smpp_password,10000); // TODO
 		sleep(1);
 	
 	}
@@ -129,24 +117,24 @@ function wait_read_gsm($path_incoming,$path_received){
 						phonenumber = '{$phone}',
 						msg = '{$msg}',
 						full_msg = '{$full_msg}';";
-				if(DEBUG == 1) log2file("pcntl_receive", $insert);
+				if(DEBUG == 1) //log2file("pcntl_receive", $insert);
 				if($db->query($insert)){
 					rename($path_incoming.$file, $path_received.$file);
 				}
 				else{
-					log2file("mysql_error",$db->error);
+					//log2file("mysql_error",$db->error);
 				}
 			}
 			else{
 				$int_id = $smsfile['Message_id'];
 				$state = $smsfile['Status']['code'];
-				$update = "update sms set result = '{$state}' where int_id = '{$int_id}';";
-				if(DEBUG == 1) log2file("pcntl_receive", $update);
+				$update = "update `sms` set `result` = 'OK', `message_state` = 2, `error_code` = '{$state}' where `method` = 'gsm' and `int_id` = '{$int_id}';";
+				if(DEBUG == 1) //log2file("pcntl_receive", $update);
 				if($db->query($update)){
 					rename($path_incoming.$file, $path_received.$file);
 				}
 				else{
-					log2file("mysql_error",$db->error);
+					//log2file("mysql_error",$db->error);
 				}
 			}
 		}
@@ -203,34 +191,6 @@ function parse_sms_file($filecontent){
 	
 	return $result;
 	
-}
-
-function wait_read_smpp($smpp_hosts,$smpp_port,$smpp_login,$smpp_password,$wait=60000){
-	
-	/*
-	 * TODO: not complited!
-	 */
-
-	// Construct transport and client
-	$transport = new SocketTransport($smpp_hosts,$smpp_port);
-	$transport->setRecvTimeout($wait); // for this example wait up to 60 seconds for data
-	$smpp = new SmppClient($transport);
-
-	// Activate binary hex-output of server interaction
-	$smpp->debug = false;
-	$transport->debug = false;
-
-	// Open the connection
-	$transport->open();
-	$smpp->bindReceiver($smpp_login,$smpp_password);
-
-	// Read SMS and output
-	$sms = $smpp->readSMS();
-	echo "SMS:\n";
-	var_dump($sms);
-
-	// Close connection
-	$smpp->close();
 }
 
 function sig_handler($signo){

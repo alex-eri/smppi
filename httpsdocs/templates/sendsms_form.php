@@ -21,8 +21,8 @@ $sendsms_html = <<<HTML
 					<label for="method" class="col-sm-2 control-label">{$label_method}</label>
 					<div class="col-sm-10">
 						<select class="form-control" id="method" name="method">
-						<option value="gsm">{$option_gsm}</option>
-						<option value="smpp">{$option_smpp}</option>
+							<option value="smpp">{$option_smpp}</option>
+							<option value="gsm">{$option_gsm}</option>
 						</select>
 					</div>
 				</div>

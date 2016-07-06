@@ -77,8 +77,8 @@ elseif($act == "start"){
 		
 		// from fork
 		require_once("config.php");
-		require_once("smpp/smppclient.class.php");
-		require_once("smpp/sockettransport.class.php");
+		require_once("../httpsdocs/includes/smpp/smppclient.class.php");
+		require_once("../httpsdocs/includes/smpp/sockettransport.class.php");
 		require_once("db.php");
 		require_once("log.php");
 		

@@ -1,6 +1,7 @@
 <?php
 
-define("SEND_ERROR", "Не заполнены поля");
+define("FIELDS_ERROR", "Не заполнены поля");
+define("SEND_ERROR", "Ошибка отправки");
 
 define("USER_FIELDS_ERROR", "Не заполнены поля");
 
@@ -16,8 +17,11 @@ define("THEAD_IP", "Разрешенные IP");
 define("THEAD_INTERFACE", "Интерфейс");
 define("THEAD_RIGHTS", "Права");
 define("SENT_YES", "Отправлено");
-define("SENT_NO", "В процессе");
+define("SENT_NO", "Не отправлено");
+define("IN_PROCESS", "В процессе");
 define("DELIVERED", "Доставлено");
+define("SENT_ERROR", "Ошибка отправки");
+define("DELIVER_ERROR", "Не доставлено");
 define("PC_SENDING_ON", "Отправка включена");
 define("PC_SENDING_OFF", "Отправка выключена");
 define("PC_RECEIVING_ON", "Прием включен");

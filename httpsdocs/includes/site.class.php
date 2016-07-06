@@ -2,9 +2,13 @@
 
 /*
  * includes/site.class.php
- * 
+ *
  * web interface class
  */
+
+require_once 'smpp/smppclient.class.php';
+require_once 'smpp/gsmencoder.class.php';
+require_once 'smpp/sockettransport.class.php';
 
 class SmppiSite {
 
@@ -18,19 +22,24 @@ class SmppiSite {
 	}
 	
 	var $limit = 25;
+	const PATH_INCOMING = PATH_INCOMING;
+	const PATH_LOG = PATH_LOG;
+	const PATH_OUTGOUING = PATH_OUTGOUING;
+	const PATH_RECEIVED = PATH_RECEIVED;
+	const PATH_SENT = PATH_SENT;
 	
 	function getsms($direction=0,$page=1){
 		
 		/*
 		 * get sms from db
-		 * 
+		 *
 		 * array
 		 */
 		
 		if($page<1) $page=1;
 		$start = ($page-1)*$this->limit;
 		
-		$select = "select id, phonenumber, tstamp, msg, process, method, result from sms where direction = '{$direction}' order by id desc limit {$start}, {$this->limit};";
+		$select = "select * from `sms` where `direction` = '{$direction}' order by `id` desc limit {$start}, {$this->limit};";
 		
 		$return = array();
 		if($result = $this->db->query($select)){
@@ -63,35 +72,6 @@ class SmppiSite {
 			return false;
 		}
 	
-	}
-	
-	function sendsms($phone,$msg,$translit=0,$method="gsm"){
-		
-		/*
-		 * insert sms into queue
-		 * 
-		 * boolean
-		 */
-		
-		if($phone != "" && $msg != ""){
-		
-			$phone = $this->check_phone($phone);
-			if($translit == 1) $msg = $this->rus2lat($msg);
-			$msg = $this->db->real_escape_string($msg);
-			
-			$insert = "insert into sms set phonenumber = '{$phone}', msg = '{$msg}', tstamp=now(), direction = 1, process = 0, method = '{$method}';";
-			if($this->db->query($insert)){
-				$sms_id = $this->db->insert_id;
-				return $sms_id;
-			}
-			else{
-				return false;
-			}
-		}
-		else{
-			return false;
-		}
-		
 	}
 	
 	function pagination($iCurr, $iEnd, $iRange){
@@ -160,7 +140,7 @@ class SmppiSite {
 		
 		/*
 		 * get web user id
-		 * 
+		 *
 		 * integer or false
 		 */
 		
@@ -265,27 +245,25 @@ class SmppiSite {
 		$select = "select `right` from sms_users_rights where user_id = '{$id}';";
 		if($result = $this->db->query($select)){
 			while($row = $result->fetch_assoc()){
-				$rights[] = $row['right']; 
+				$rights[] = $row['right'];
 			}
 		}
-		return $rights;	
+		return $rights;
 	}
 	
 	function users_log($user_id,$descr,$ip){
-	
+		
 		/*
 		 * write log
 		 *
 		 * boolean
 		 */
-	
+		
 		$insert = "insert into sms_users_log set user_id = '{$user_id}', ip='{$ip}', descr = '{$descr}';";
-		if($this->db->query($insert)){
-			return true;
+		if(!$this->db->query($insert)){
+			throw new Exception('Insert into sms_users_log error: '.$this->db->error);
 		}
-		else{
-			return false;
-		}
+		return true;
 	}
 	
 	function get_rights($id=0){
@@ -297,7 +275,7 @@ class SmppiSite {
 		 */
 		
 		if($id > 0){
-			$select = "select r.`right`, r.`descr`, if(ur.id is null,'','checked') `checked` from sms_rights r 
+			$select = "select r.`right`, r.`descr`, if(ur.id is null,'','checked') `checked` from sms_rights r
 					left join sms_users_rights ur on (r.`right` = ur.`right` and `user_id` = '{$id}')
 					where 1 group by r.`right`;";
 		}
@@ -368,7 +346,7 @@ class SmppiSite {
 		 * array
 		 */
 		
-		$user_option = ($id > 0) ? " and `id` = '{$id}' " : ""; 
+		$user_option = ($id > 0) ? " and `id` = '{$id}' " : "";
 		
 		$select = "select `id`, `login`, `ip`, `interface` from sms_users where 1 {$user_option} order by login;";
 		
@@ -449,7 +427,7 @@ class SmppiSite {
 			}
 			$update_values = implode(",",$update_array);
 			
-			if(!empty($id)){	
+			if(!empty($id)){
 				$update = "update sms_users set {$update_values} where `id` = '{$id}';";
 				if($result = $this->db->query($update)){
 					return true;
@@ -531,7 +509,7 @@ class SmppiSite {
 		
 		/*
 		 * check RU phonenumbers
-		 * 
+		 *
 		 * string
 		 */
 		
@@ -558,7 +536,277 @@ class SmppiSite {
 		}
 		else{
 			return false;
-		}	
+		}
+	}
+	
+	// refactor
+	
+	public function sendsms($phone,$msg,$translit=0,$method="gsm"){
+		
+		/*
+		 * insert sms into queue
+		 *
+		 * boolean
+		 */
+		
+		if($phone != "" && $msg != ""){
+			
+			$phone = $this->check_phone($phone);
+			if($translit == 1) $msg = $this->rus2lat($msg);
+			
+			if($method == "smpp"){
+				
+				global $smpp_from; // FIXIT!
+				
+				try{
+					$smpp_id = $this->smpp_send($smpp_from,$phone,$msg);
+					return true;
+				}
+				catch (Exception $e){
+					return false;
+				}
+			}
+			elseif($method == "gsm") {
+				
+				try{
+					$gsm_id = $this->gsm_send($phone,$msg);
+					return true;
+				}
+				catch (Exception $e){
+					print_r($e->getMessage());
+					return false;
+				}
+				
+			}
+		}
+		else{
+			return false;
+		}
+	}
+	
+	private function insert_into_db($table='sms',$fields){
+		
+		/*
+		 * abstract insert
+		 *
+		 * integer
+		 */
+		
+		$fields_array = [];
+		foreach($fields as $field => $value){
+			$fields_array[] = " `{$field}` = '{$value}' ";
+		}
+		$fields_string = implode(',',$fields_array);
+		
+		if($fields_string == ''){
+			throw new Exception('Insert SMPP SMS empty fields');
+		}
+		$insert = "insert into `{$table}` set {$fields_string};";
+		if(!$this->db->query($insert)){
+			throw new Exception('Insert SMPP SMS into DB error: '.$this->db->error);
+		}
+		$sms_id = $this->db->insert_id;
+		return $sms_id;
+		
+	}
+	
+	private function update_into_db($table='sms',$id,$fields){
+	
+		/*
+		 * abstract update
+		 *
+		 * integer
+		 */
+	
+		$fields_array = [];
+		foreach($fields as $field => $value){
+			$fields_array[] = " `{$field}` = '{$value}' ";
+		}
+		$fields_string = implode(',',$fields_array);
+	
+		if($fields_string == '' || $id == ''){
+			throw new Exception('Update SMPP SMS empty fields or id');
+		}
+		$update = "update `{$table}` set {$fields_string} where `id` = '{$id}';";
+		if(!$this->db->query($update)){
+			throw new Exception('Update SMPP SMS into DB error: '.$this->db->error);
+		}
+		return $id;
+	}
+	
+	private function smpp_send($smpp_from,$smpp_to,$message){
+		
+		global $smpp_hosts,$smpp_port,$smpp_login,$smpp_password;
+		
+		// Construct transport and client
+		$transport = new SocketTransport($smpp_hosts,$smpp_port);
+		$transport->setRecvTimeout(10000);
+		$smpp = new SmppClient($transport);
+	
+		// Activate binary hex-output of server interaction
+		$smpp->debug = false;
+		$transport->debug = false;
+	
+		$transport->open();
+		$smpp->bindTransmitter($smpp_login,$smpp_password);
+	
+		// Optional connection specific overrides
+		SmppClient::$sms_null_terminate_octetstrings = false;
+		SmppClient::$csms_method = SmppClient::CSMS_PAYLOAD;
+		SmppClient::$sms_registered_delivery_flag = SMPP::REG_DELIVERY_SMSC_BOTH;
+	
+		// Prepare message
+		$tags = "CSMS_16BIT_TAGS";
+	
+		if(preg_match ('/^[\p{Cyrillic}\p{Common}]+$/u', $message)){
+			$data_coding = SMPP::DATA_CODING_UCS2;
+			$encodedMessage = iconv("UTF-8","UCS-2BE",$message);
+		}
+		else{
+			$data_coding = SMPP::DATA_CODING_ISO8859_1;
+			$encodedMessage = $message;
+		}
+		
+		$from = new SmppAddress($smpp_from,SMPP::TON_ALPHANUMERIC);
+		$to = new SmppAddress($smpp_to,SMPP::TON_INTERNATIONAL,SMPP::NPI_E164);
+	
+		if(!$smpp_id = $smpp->sendSMS($from,$to,$encodedMessage,$tags,$data_coding)){
+			$smpp->close();
+			throw new Exception('SMPP send error');
+		}
+		$smpp_id = trim($smpp_id);
+		
+		$fields = [
+				'from' => $smpp_from,
+				'phonenumber' => $smpp_to,
+				'msg' => $message,
+				'full_msg' => $smpp_id,
+				'direction' => 1,
+				'method' => 'smpp',
+		];
+		if(!$sms_id = $this->insert_into_db('sms',$fields)){
+			throw new Exception('SMPP Error insert into DB '.$this->db->error);
+		}
+		
+		$fields['dt'] = date('Y-m-d H:i:s');
+		$fields['result'] = 'OK';
+		$fields['process'] = '1';
+		if(!$this->update_into_db('sms',$sms_id,$fields)){
+			throw new Exception('SMPP Error update into DB '.$this->db->error);
+		}
+		return $sms_id;
+		
+	}
+	
+	public function smpp_check($smpp_id){
+		
+		global $smpp_hosts,$smpp_port,$smpp_login,$smpp_password,$smpp_from;
+	
+		$transport = new SocketTransport($smpp_hosts,$smpp_port);
+		$transport->setRecvTimeout(10000);
+		$smpp = new SmppClient($transport);
+	
+		$smpp->debug = false;
+		$transport->debug = false;
+	
+		$transport->open();
+		$smpp->bindTransmitter($smpp_login,$smpp_password);
+	
+		$source = new SmppAddress($smpp_from,SMPP::TON_ALPHANUMERIC);
+	
+		if(!$smpp_res = $smpp->queryStatus($smpp_id,$source)){
+			$smpp->close();
+			throw new Exception('SMPP check error');
+		}
+		return $smpp_res;
+	}
+	
+	public function update_operator_state($msg_id,$message_state,$error_code){
+		
+		$fields = [
+				'message_state' => $message_state,
+				'error_code' => $error_code,
+		];
+		
+		if($this->update_into_db('sms',$msg_id,$fields)){
+			return true;
+		}
+		else{
+			return false;
+		}
+	
+	}
+	
+	private function gsm_send($to,$message){
+		// gsm send
+		
+		if(preg_match('/^[\p{Cyrillic}\p{Common}]+$/u', $message)){
+			$add = "\nAlphabet: Unicode";
+			$encodedMessage = iconv("UTF-8","UCS-2BE",$message);
+		}
+		else{
+			$add = "";
+			$encodedMessage = $message;
+		}
+		
+		$file_src = "To: +{$to}{$add}\n\n{$encodedMessage}";
+		
+		$full_msg = $this->db->real_escape_string($file_src);
+		$fields = [
+				'phonenumber' => $to,
+				'msg' => $message,
+				'direction' => 1,
+				'process' => 0,
+				'method' => 'gsm',
+		];
+		
+		if (!$id = $this->insert_into_db('sms',$fields)){
+			throw new Exception('GSM Error insert into DB '.$this->db->error);
+		}
+		
+		if(!file_put_contents($this::PATH_OUTGOUING."sms{$id}", $file_src)){
+			throw new Exception('GSM Create outgoing file error');
+		}
+		
+		$fields = [
+			'full_msg' => $full_msg,
+			'dt' => date('Y-m-d H:i:s'),
+			'process' => 1
+		];
+		if(!$this->update_into_db('sms',$id, $fields)){
+			throw new Exception('GSM Error update into DB '.$this->db->error);
+		}
+		return $id;
+	}
+	
+	public function gsm_check(){
+	
+		$select = "select id from sms where direction = 1 and process = 1 and result is null and method = 'gsm' and tstamp > now() - interval 1 day;";
+		if($result = $this->db->query($select)){
+			while($row = $result->fetch_assoc()){
+				$id = $row['id'];
+				if(file_exists($path_sent."sms".$id)){
+					$file = file_get_contents($this::PATH_SENT."sms".$id);
+					$lines = explode("\n", $file);
+					foreach($lines as $line){
+						if($line != "" && strpos($line,": ") > 0){
+							list($param,$value) = explode(": ",$line);
+							if($param == "Message_id") $int_id = $value;
+						}
+					}
+					$fields = [
+							'full_msg' => $file,
+							'result' => 'SENT',
+					];
+					if (isset($int_id)) {
+						$fields['int_id'] = $int_id;
+					}
+					if(!$this->update_into_db('sms',$id, $fields)){
+						throw new Exception('GSM Error update into DB '.$this->db->error);
+					}
+				}
+			}
+		}
 	}
 	
 }

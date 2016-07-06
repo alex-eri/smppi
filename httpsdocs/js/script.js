@@ -23,6 +23,10 @@ $(document).ready(function() {
 		$('#char_count').text(msg.length);
 	});
 	
+	$('.sent-10').popover(options = {
+		html : true,
+	});
+	$('.sent-10').css('cursor','pointer');
 	
 });
 
