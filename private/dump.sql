@@ -8,25 +8,27 @@ DROP DATABASE IF EXISTS `smstools`;
 CREATE DATABASE IF NOT EXISTS `smstools` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `smstools`;
 
-
 -- Дамп структуры для таблица smstools.sms
 DROP TABLE IF EXISTS `sms`;
 CREATE TABLE IF NOT EXISTS `sms` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `from` varchar(32) NOT NULL DEFAULT '',
   `phonenumber` varchar(32) NOT NULL DEFAULT '',
   `tstamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `dt` datetime DEFAULT NULL,
   `full_msg` text,
   `msg` text,
   `result` varchar(64) DEFAULT NULL,
-  `int_id` int(11) DEFAULT NULL,
+  `int_id` int(10) DEFAULT NULL COMMENT 'GSM internal ID',
+  `message_state` int(10) DEFAULT NULL COMMENT 'Operator SMPP state',
+  `error_code` int(10) DEFAULT NULL COMMENT 'Operator SMPP error code',
   `direction` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '1-outgoing, 0-incoming',
   `process` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT 'is processed',
   `method` enum('gsm','smpp') NOT NULL DEFAULT 'gsm',
   PRIMARY KEY (`id`),
   KEY `phonenumber` (`phonenumber`),
   KEY `method` (`method`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=417 DEFAULT CHARSET=utf8;
 
 
 -- Дамп структуры для таблица smstools.sms_rights
@@ -37,13 +39,14 @@ CREATE TABLE IF NOT EXISTS `sms_rights` (
   PRIMARY KEY (`right`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
 -- Дамп данных таблицы smstools.sms_rights: ~4 rows (приблизительно)
 /*!40000 ALTER TABLE `sms_rights` DISABLE KEYS */;
 INSERT INTO `sms_rights` (`right`, `descr`) VALUES
-	('SMS_ACCESS', 'Доступ к веб-интерфейсу SMS'),
-	('SMS_ADMIN', 'Доступ к интерфейсу управления'),
-	('SMS_APISEND', 'Доступ к отправке SMS через API'),
-	('SMS_WEBSEND', 'Доступ к отправке SMS через веб');
+    ('SMS_ACCESS', 'Доступ к веб-интерфейсу SMS'),
+    ('SMS_ADMIN', 'Доступ к интерфейсу управления'),
+    ('SMS_APISEND', 'Доступ к отправке SMS через API'),
+    ('SMS_WEBSEND', 'Доступ к отправке SMS через веб');
 /*!40000 ALTER TABLE `sms_rights` ENABLE KEYS */;
 
 
@@ -56,12 +59,13 @@ CREATE TABLE IF NOT EXISTS `sms_users` (
   `ip` varchar(256) DEFAULT NULL,
   `interface` enum('api','web') NOT NULL DEFAULT 'web',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 
--- Дамп данных таблицы smstools.sms_users: ~1 rows (приблизительно)
+
+-- Дамп данных таблицы smstools.sms_users: ~3 rows (приблизительно)
 /*!40000 ALTER TABLE `sms_users` DISABLE KEYS */;
 INSERT INTO `sms_users` (`id`, `login`, `password`, `ip`, `interface`) VALUES
-	(1, 'admin', '21232f297a57a5a743894a0e4a801fc3', '*', 'web');
+    (1, 'admin', 'c3284d0f94606de1fd2af172aba15bf3', '*', 'web');
 /*!40000 ALTER TABLE `sms_users` ENABLE KEYS */;
 
 
@@ -75,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `sms_users_log` (
   `descr` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=266 DEFAULT CHARSET=utf8;
 
 
 -- Дамп структуры для таблица smstools.sms_users_rights
@@ -87,14 +91,16 @@ CREATE TABLE IF NOT EXISTS `sms_users_rights` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `right` (`right`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
 
--- Дамп данных таблицы smstools.sms_users_rights: ~4 rows (приблизительно)
+
+-- Дамп данных таблицы smstools.sms_users_rights: ~8 rows (приблизительно)
 /*!40000 ALTER TABLE `sms_users_rights` DISABLE KEYS */;
 INSERT INTO `sms_users_rights` (`id`, `user_id`, `right`) VALUES
-	(16, 1, 'SMS_ACCESS'),
-	(17, 1, 'SMS_WEBSEND'),
-	(18, 1, 'SMS_ADMIN');
+    (1, 1, 'SMS_ACCESS'),
+    (2, 1, 'SMS_ADMIN'),
+    (3, 1, 'SMS_APISEND'),
+    (4, 1, 'SMS_WEBSEND');
 /*!40000 ALTER TABLE `sms_users_rights` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
