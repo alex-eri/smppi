@@ -558,22 +558,29 @@ class SmppiSite {
 				
 				global $smpp_from; // FIXIT!
 				
+				$this->db->query("START TRANSACTION;");
 				try{
 					$smpp_id = $this->smpp_send($smpp_from,$phone,$msg);
+					$this->db->query("COMMIT;");
 					return true;
 				}
 				catch (Exception $e){
+					print_r($e->getMessage()); // hard debug. remove this
+					$this->db->query("ROLLBACK;");
 					return false;
 				}
 			}
 			elseif($method == "gsm") {
 				
+				$this->db->query("START TRANSACTION;");
 				try{
 					$gsm_id = $this->gsm_send($phone,$msg);
+					$this->db->query("COMMIT;");
 					return true;
 				}
 				catch (Exception $e){
-					print_r($e->getMessage());
+					print_r($e->getMessage()); // hard debug. remove this
+					$this->db->query("ROLLBACK;");
 					return false;
 				}
 				
@@ -777,36 +784,6 @@ class SmppiSite {
 			throw new Exception('GSM Error update into DB '.$this->db->error);
 		}
 		return $id;
-	}
-	
-	public function gsm_check(){
-	
-		$select = "select id from sms where direction = 1 and process = 1 and result is null and method = 'gsm' and tstamp > now() - interval 1 day;";
-		if($result = $this->db->query($select)){
-			while($row = $result->fetch_assoc()){
-				$id = $row['id'];
-				if(file_exists($path_sent."sms".$id)){
-					$file = file_get_contents($this::PATH_SENT."sms".$id);
-					$lines = explode("\n", $file);
-					foreach($lines as $line){
-						if($line != "" && strpos($line,": ") > 0){
-							list($param,$value) = explode(": ",$line);
-							if($param == "Message_id") $int_id = $value;
-						}
-					}
-					$fields = [
-							'full_msg' => $file,
-							'result' => 'SENT',
-					];
-					if (isset($int_id)) {
-						$fields['int_id'] = $int_id;
-					}
-					if(!$this->update_into_db('sms',$id, $fields)){
-						throw new Exception('GSM Error update into DB '.$this->db->error);
-					}
-				}
-			}
-		}
 	}
 	
 }

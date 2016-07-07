@@ -111,7 +111,7 @@ if ($part == "outgoing") {
 			$sms ['phonenumber'] = ($demo_number != "") ? $demo_number : $sms ['phonenumber'];
 			
 			$msg = htmlspecialchars ( $sms ['msg'] );
-			if ($sms ['result'] == "OK") {
+			if ($sms ['result'] == "OK" || $sms ['result'] == "SENT") {
 				$process = SENT_YES;
 			} elseif ($sms ['result'] == "ERROR") {
 				$process = SENT_ERROR;
@@ -201,7 +201,7 @@ if ($part == "adm" && in_array ( "SMS_ADMIN", $user_rights )) {
 	$content_page .= "
 			<div class=\"panel panel-default\">
 				<div class=\"panel-body\">
-					{$label_send}&nbsp;{$label_receive}<span class=\"label label-info pull-right\">My number: {$my_number}</span>
+					<span class=\"label label-info\">My number: {$my_number}</span>
 				</div>
 			</div>
 	";
