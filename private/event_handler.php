@@ -1,6 +1,10 @@
 #!/usr/bin/php
 <?php
 
+/*
+ * private/event_handler.php
+ */
+
 require_once("config.php");
 require_once("db.php");
 
