@@ -8,3 +8,6 @@ Smstools Web Interface
 Default username: **admin**
 
 Default password: **admin**
+
+set path to private/event_handler.php into smsd.conf:
+eventhandler = /path/to/private/event_handler.php
