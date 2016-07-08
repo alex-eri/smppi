@@ -112,11 +112,11 @@ if ($part == "outgoing") {
 			
 			$msg = htmlspecialchars ( $sms ['msg'] );
 			if ($sms ['result'] == "OK" || $sms ['result'] == "SENT") {
-				$process = SENT_YES;
+				$process_html = "<span class=\"label label-success\">" . SENT_YES . "</span>";
 			} elseif ($sms ['result'] == "ERROR") {
-				$process = SENT_ERROR;
+				$process_html = "<span class=\"label label-danger\">" . SENT_ERROR . "</span>";
 			} else {
-				$process = SENT_NO;
+				$process_html = "<span class=\"label label-default\">" . SENT_NO . "</span>";
 			}
 			
 			$smpp_state_html = "";
@@ -153,8 +153,7 @@ if ($part == "outgoing") {
 							data-toggle=\"popover\"
 							data-placement=\"top\"
 							data-content=\"To: {$sms['phonenumber']}<br />Datetime: {$sms['dt']}<br />{$sms['result']}: {$sms['full_msg']}<br />Error code: {$sms['error_code']}\">
-							{$process}
-							{$smpp_state_html}
+							{$process_html}&nbsp{$smpp_state_html}
 						</td>
 						<td class=\"msg-70\">{$msg}<span class=\"label label-default pull-right\">{$sms['method']}</span>	</td>
 					</tr>

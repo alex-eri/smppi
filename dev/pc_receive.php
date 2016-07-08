@@ -49,8 +49,8 @@ elseif($act == "start"){
 		if(file_put_contents($pid_file, $spid)){
 			print "start $spid\n";
 			
-			require_once("config.php");
-			require_once("db.php");
+			require_once("../private/config.php");
+			require_once("../private/db.php");
 			
 		}
 		else{

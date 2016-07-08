@@ -76,10 +76,10 @@ elseif($act == "start"){
 	while (true) {
 		
 		// from fork
-		require_once("config.php");
+		require_once("../private/config.php");
 		require_once("../httpsdocs/includes/smpp/smppclient.class.php");
 		require_once("../httpsdocs/includes/smpp/sockettransport.class.php");
-		require_once("db.php");
+		require_once("../private/db.php");
 		require_once("log.php");
 		
 		sms_send_gsm(PATH_OUTGOUING);

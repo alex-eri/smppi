@@ -6,9 +6,9 @@
 
 function smpp_send($smpp_hosts,$smpp_port,$smpp_login,$smpp_password,$smpp_from,$smpp_to,$message){
 
-	require_once 'includes/smpp/smppclient.class.php';
-	require_once 'includes/smpp/gsmencoder.class.php';
-	require_once 'includes/smpp/sockettransport.class.php';
+	require_once '../httpsdocs/includes/smpp/smppclient.class.php';
+	require_once '../httpsdocs/includes/smpp/gsmencoder.class.php';
+	require_once '../httpsdocs/includes/smpp/sockettransport.class.php';
 	
 	// Construct transport and client
 	$transport = new SocketTransport($smpp_hosts,$smpp_port);
@@ -58,8 +58,8 @@ function smpp_send($smpp_hosts,$smpp_port,$smpp_login,$smpp_password,$smpp_from,
 
 function smpp_check($smpp_hosts,$smpp_port,$smpp_login,$smpp_password,$smpp_from,$smpp_id){
 
-	require_once 'includes/smpp/smppclient.class.php';
-	require_once 'includes/smpp/sockettransport.class.php';
+	require_once '../httpsdocs/includes/smpp/smppclient.class.php';
+	require_once '../httpsdocs/includes/smpp/sockettransport.class.php';
 
 	$transport = new SocketTransport($smpp_hosts,$smpp_port);
 	$transport->setRecvTimeout(10000);

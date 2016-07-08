@@ -5,7 +5,6 @@
  * private/event_handler.php
  */
 
-require_once("config.php");
 require_once("db.php");
 
 if(count($argv)>1){
