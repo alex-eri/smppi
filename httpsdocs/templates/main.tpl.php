@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * templates/main.tpl.php
  */
 
@@ -9,9 +9,8 @@ include_once("templates/footer.tpl.php");
 
 $html = $header_html;
 
-$incoming = INCOMING;
-$outgoing = OUTGOING;
 $exit = BTN_EXIT;
+$base_path = BASE_PATH;
 
 $html .= <<<HTML
 		
@@ -22,14 +21,12 @@ $html .= <<<HTML
 						<span class="sr-only">Навигация</span> <span class="icon-bar"></span>
 						<span class="icon-bar"></span> <span class="icon-bar"></span>
 					</button>
-					<span class="navbar-brand" href="/">{$title_head}</span>
+					<span class="navbar-brand" href="{$base_path}">{$title_head}</span>
 				</div>
 				<div class="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
-						<li class="{$incoming_active}"><a href="/incoming/">{$incoming}</a>
-						</li>
-						<li class="{$outgoing_active}"><a href="/outgoing/">{$outgoing}</a>
-						</li>
+						{$incoming_menu}
+						{$outgoing_menu}
 						{$send_menu}
 						{$adm_menu}
 					</ul>

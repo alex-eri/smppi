@@ -9,7 +9,7 @@ $dbuser = "";
 $dbpassword = "";
 $dbname = "smstools";
 
-$site_lang = "ru"; // en|ru # 
+$site_lang = "ru"; // en|ru #
 $title = "Smstools web interface";
 $title_head = "Smstools web interface";
 
@@ -37,3 +37,4 @@ define("PATH_INCOMING","/var/spool/sms/incoming/");
 define("PATH_RECEIVED","/var/spool/sms/received/");
 define("PATH_OUTGOUING","/var/spool/sms/outgoing/");
 define("PATH_SENT","/var/spool/sms/sent/");
+define("BASE_PATH","/");

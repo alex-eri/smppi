@@ -19,19 +19,19 @@ if(in_array("SMS_WEBSEND", $user_rights)){
 		try{
 			$sms_id = $csms->sendsms($phone,$msg,$translit,$method);
 			$csms->users_log($user_id, "sendsms:{$sms_id}", $_SERVER['REMOTE_ADDR']);
-			header("location: /outgoing/");
+			header("location: " . BASE_PATH . "outgoing/");
 		}
 		catch (Exception $e){
 			$_SESSION['send_error'] = SEND_ERROR;
-			header("location: /send/");
+			header("location: " . BASE_PATH . "send/");
 		}
 	}
 	else{
 		$_SESSION['send_error'] = FIELDS_ERROR;
-		header("location: /send/");
+		header("location: " . BASE_PATH . "send/");
 	}
 		
 }
 else{
-	header("location: /");
+	header("location: " . BASE_PATH . "");
 }

@@ -23,8 +23,10 @@ $send_active = ($part == "send") ? "active" : "";
 $adm_active = ($part == "adm") ? "active" : "";
 
 // menu access
-$send_menu = (in_array ( "SMS_WEBSEND", $user_rights )) ? "<li class=\"{$send_active}\"><a href=\"/send/\">" . MENU_SEND_SMS . "</a></li>" : "";
-$adm_menu = (in_array ( "SMS_ADMIN", $user_rights )) ? "<li class=\"{$adm_active}\"><a href=\"/adm/\">" . MENU_MANAGE . "</a></li>" : "";
+$incoming_menu = "<li class=\"{$incoming_active}\"><a href=\"" . BASE_PATH . "incoming/\">" . INCOMING . "</a></li>";
+$outgoing_menu = "<li class=\"{$outgoing_active}\"><a href=\"" . BASE_PATH . "outgoing/\">" . OUTGOING . "</a></li>";
+$send_menu = (in_array ( "SMS_WEBSEND", $user_rights )) ? "<li class=\"{$send_active}\"><a href=\"" . BASE_PATH . "send/\">" . MENU_SEND_SMS . "</a></li>" : "";
+$adm_menu = (in_array ( "SMS_ADMIN", $user_rights )) ? "<li class=\"{$adm_active}\"><a href=\"" . BASE_PATH . "adm/\">" . MENU_MANAGE . "</a></li>" : "";
 
 // make web content
 $content_page = "";

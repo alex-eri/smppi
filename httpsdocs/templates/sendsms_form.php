@@ -8,6 +8,7 @@ $label_phone = LABEL_PHONE;
 $label_msg = LABEL_MSG;
 $label_translit = LABEL_TRANSLIT;
 $btn_send = BTN_SEND;
+$base_path = BASE_PATH;
 
 $sendsms_html = <<<HTML
 	<div class="container">
@@ -16,7 +17,7 @@ $sendsms_html = <<<HTML
 				<h3 class="panel-title">{$send_title} {$send_error}</h3>
 			</div>
 			<div class="panel-body">
-				<form name="sendsms" method="post" action="/send.act.php" class="form-horizontal" role="form">
+				<form name="sendsms" method="post" action="{$base_path}send.act.php" class="form-horizontal" role="form">
 				<div class="form-group">
 					<label for="method" class="col-sm-2 control-label">{$label_method}</label>
 					<div class="col-sm-10">

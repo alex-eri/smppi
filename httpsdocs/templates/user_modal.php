@@ -7,6 +7,7 @@ $label_interface = LABEL_INTERFACE;
 $label_rights = LABEL_RIGHTS;
 $btn_close = BTN_CLOSE;
 $btn_save = BTN_SAVE;
+$base_path = BASE_PATH;
 
 $modal_html = <<<HTML
 	<div class="modal fade" id="create_user" tabindex="-1" role="dialog" aria-hidden="true">
@@ -17,7 +18,7 @@ $modal_html = <<<HTML
 					<h4 class="modal-title"></h4>
 				</div>
 				<div class="modal-body">
-					<form name="create_user" method="post" action="/user.act.php" class="form-horizontal" role="form">
+					<form name="create_user" method="post" action="{$base_path}user.act.php" class="form-horizontal" role="form">
 					<div class="form-group">
 						<label for="user_login" class="col-sm-2 control-label">{$label_login}</label>
 						<div class="col-sm-10">

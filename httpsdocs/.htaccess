@@ -5,8 +5,6 @@
 </Files>
 
 RewriteEngine On
-
 RewriteBase /
-
 RewriteRule ^api/$ /api.php [QSA]
 RewriteRule ^([a-zA-Z0-9]+)(/?)$ /?part=$1 [QSA]

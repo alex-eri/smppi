@@ -39,7 +39,7 @@ if(in_array("SMS_ADMIN", $user_rights)){
 						$csms->insert_right($new_user_id, $right);
 					}
 				}
-				header("location: /adm/");
+				header("location: " . BASE_PATH . "adm/");
 			}
 		}
 	elseif(isset($_REQUEST['user_id'])
@@ -69,7 +69,7 @@ if(in_array("SMS_ADMIN", $user_rights)){
 					$csms->insert_right($new_user_id, $right);
 				}
 			}
-			header("location: /adm/");
+			header("location: " . BASE_PATH . "adm/");
 		}
 	}
 	elseif(isset($_REQUEST['del_user_id'])){
@@ -77,13 +77,13 @@ if(in_array("SMS_ADMIN", $user_rights)){
 		$csms->users_log($user_id, "delete user:{$del_user_id}", $_SERVER['REMOTE_ADDR']);
 		$csms->delete_rights($del_user_id);
 		$csms->delete_user($del_user_id);
-		header("location: /adm/");
+		header("location: " . BASE_PATH . "adm/");
 	}
 	else{
 		$_SESSION['user_error'] = USER_FIELDS_ERROR;
-		header("location: /adm/");
+		header("location: " . BASE_PATH . "adm/");
 	}
 }
 else{
-	header("location: /");
+	header("location: " . BASE_PATH . "");
 }
