@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `sms_users` (
 -- Дамп данных таблицы smstools.sms_users: ~3 rows (приблизительно)
 /*!40000 ALTER TABLE `sms_users` DISABLE KEYS */;
 INSERT INTO `sms_users` (`id`, `login`, `password`, `ip`, `interface`) VALUES
-    (1, 'admin', 'c3284d0f94606de1fd2af172aba15bf3', '*', 'web');
+    (1, 'admin', '21232f297a57a5a743894a0e4a801fc3', '*', 'web');
 /*!40000 ALTER TABLE `sms_users` ENABLE KEYS */;
 
 
