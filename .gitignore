@@ -1,4 +1,8 @@
 httpdocs/
 log/
+private/tg/
 config.php
 test.php
+*.key
+composer.lock
+

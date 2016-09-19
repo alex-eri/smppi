@@ -9,7 +9,6 @@ $header_html = <<<HTML
 	<link rel="shortcut icon" href="{$base_path}images/favicon.ico">
 
 	<link href="{$base_path}css/bootstrap.min.css" rel="stylesheet">
-	<link href="{$base_path}css/bootstrap-theme.min.css" rel="stylesheet">
 	<link href="{$base_path}css/theme.css" rel="stylesheet">
 
 	<!--[if lt IE 9]>
