@@ -665,7 +665,7 @@ class SmppiSite {
 		// Prepare message
 		$tags = "CSMS_16BIT_TAGS";
 	
-		if(preg_match ('/^[\p{Cyrillic}\p{Common}]+$/u', $message)){
+		if(preg_match ('/[\p{Cyrillic}\p{Common}]+/u', $message)){
 			$data_coding = SMPP::DATA_CODING_UCS2;
 			$encodedMessage = iconv("UTF-8","UCS-2BE",$message);
 		}
