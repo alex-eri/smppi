@@ -374,14 +374,6 @@ class SmppiSite {
 		$insert_array = array();
 		if(is_array($params)){
 			foreach ($params as $key=>$value){
-				if($key == "password") {
-					if($value != ""){
-						$value = md5($value);
-					}
-					else{
-						continue;
-					}
-				}
 				$insert_array[] = " `{$key}` = '{$value}' ";
 			}
 			$insert_values = implode(",",$insert_array);

@@ -18,7 +18,7 @@ if(isset($_SESSION['key'])){
 elseif(isset($_REQUEST['login']) && isset($_REQUEST['password']) && $_REQUEST['login'] != "" && $_REQUEST['password'] != ""){
 	
 	$login = $_REQUEST['login'];
-	$password = md5($_REQUEST['password']);
+	$password = md5(trim($_REQUEST['password']));
 	
 	if($user_id = $csms->user_auth($login,$password)){
 		$_SESSION['key'] = $csms->user_get_key($user_id,$_SERVER['REMOTE_ADDR']);

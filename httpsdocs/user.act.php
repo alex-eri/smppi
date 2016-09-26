@@ -28,7 +28,7 @@ if(in_array("SMS_ADMIN", $user_rights)){
 			){
 		$params = array(
 			"login" => $_REQUEST['user_login'],
-			"password" => md5($_REQUEST['user_password']),
+			"password" => md5(trim($_REQUEST['user_password'])),
 			"ip" => $_REQUEST['user_ip'],
 			"interface" => $_REQUEST['user_interface'],
 		);
