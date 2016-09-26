@@ -747,7 +747,7 @@ class SmppiSite {
 	private function gsm_send($to,$message){
 		// gsm send
 		
-		if(preg_match('/^[\p{Cyrillic}\p{Common}]+$/u', $message)){
+		if(preg_match('/[\p{Cyrillic}\p{Common}]+/u', $message)){
 			$add = "\nAlphabet: Unicode";
 			$encodedMessage = iconv("UTF-8","UCS-2BE",$message);
 		}
